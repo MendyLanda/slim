@@ -222,17 +222,20 @@ var domainVerifyCmd = &cobra.Command{
 					}
 
 					var result struct {
-						Domain domainEntry `json:"domain"`
+						Status string `json:"status"`
 					}
 					if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
 						return "done", nil
 					}
 
-					if !result.Domain.Verified {
-						return "", fmt.Errorf("DNS records not found for %s — make sure your A record points to the correct IP", domain)
+					switch result.Status {
+					case "active":
+						return "verified", nil
+					case "issuing_cert":
+						return "issuing certificate (this may take a moment)", nil
+					default:
+						return "done", nil
 					}
-
-					return "done", nil
 				},
 			},
 		})
