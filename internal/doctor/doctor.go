@@ -110,7 +110,7 @@ func checkPortForwarding() CheckResult {
 }
 
 func checkHostsFile(domain string) CheckResult {
-	hostname := domain + ".local"
+	hostname := domain + ".internal"
 	name := "Hosts: " + hostname
 
 	content, err := readFileFn("/etc/hosts")
@@ -139,7 +139,7 @@ func checkDaemon() CheckResult {
 }
 
 func checkLeafCert(domain string) CheckResult {
-	name := "Cert: " + domain + ".local"
+	name := "Cert: " + domain + ".internal"
 
 	data, err := readFileFn(cert.LeafCertPath(domain))
 	if err != nil {

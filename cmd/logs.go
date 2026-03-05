@@ -22,7 +22,7 @@ var logsCmd = &cobra.Command{
 	Long: `Tail the access log. Optionally filter by domain name.
 
   slim logs             # all domains
-  slim logs myapp       # only myapp.local
+  slim logs myapp       # only myapp.internal
   slim logs -f          # follow (like tail -f)
   slim logs --flush     # clear log file`,
 	Args: cobra.MaximumNArgs(1),
@@ -56,7 +56,7 @@ var logsCmd = &cobra.Command{
 
 		filter := ""
 		if len(args) > 0 {
-			filter = normalizeName(args[0]) + ".local"
+			filter = normalizeName(args[0]) + ".internal"
 		}
 
 		if logsFollow {

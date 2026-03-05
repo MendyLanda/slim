@@ -126,8 +126,8 @@ func TestEnsureLeafCertAndLoadLeafTLS(t *testing.T) {
 	if err != nil {
 		t.Fatalf("ParseCertificate: %v", err)
 	}
-	if cert.Subject.CommonName != "myapp.local" {
-		t.Fatalf("expected CN myapp.local, got %q", cert.Subject.CommonName)
+	if cert.Subject.CommonName != "myapp.internal" {
+		t.Fatalf("expected CN myapp.internal, got %q", cert.Subject.CommonName)
 	}
 }
 
@@ -214,7 +214,7 @@ func writeLeafCertPEM(name string, keyType string, notAfter time.Time) error {
 	template := &x509.Certificate{
 		SerialNumber: serial,
 		Subject: pkix.Name{
-			CommonName: name + ".local",
+			CommonName: name + ".internal",
 		},
 		NotBefore: time.Now().Add(-time.Hour),
 		NotAfter:  notAfter,

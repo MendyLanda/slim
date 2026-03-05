@@ -27,7 +27,7 @@ func TestAddHostAppendsMarkedEntry(t *testing.T) {
 	if wrotePath != hostsPath {
 		t.Fatalf("expected write path %q, got %q", hostsPath, wrotePath)
 	}
-	if !strings.Contains(wroteContent, "myapp.local") || !strings.Contains(wroteContent, marker) {
+	if !strings.Contains(wroteContent, "myapp.internal") || !strings.Contains(wroteContent, marker) {
 		t.Fatalf("expected hosts entry to be appended, got %q", wroteContent)
 	}
 }
@@ -37,7 +37,7 @@ func TestAddHostNoopWhenEntryAlreadyExists(t *testing.T) {
 	defer restore()
 
 	readFileHostFn = func(string) ([]byte, error) {
-		return []byte("127.0.0.1 myapp.local # slim\n"), nil
+		return []byte("127.0.0.1 myapp.internal # slim\n"), nil
 	}
 
 	called := false
@@ -61,9 +61,9 @@ func TestRemoveHostRemovesOnlyMarkedMatchingEntry(t *testing.T) {
 	readFileHostFn = func(string) ([]byte, error) {
 		return []byte(strings.Join([]string{
 			"127.0.0.1 localhost",
-			"127.0.0.1 myapp.local # slim",
-			"127.0.0.1 myapp.local # another-tool",
-			"127.0.0.1 api.local # slim",
+			"127.0.0.1 myapp.internal # slim",
+			"127.0.0.1 myapp.internal # another-tool",
+			"127.0.0.1 api.internal # slim",
 			"",
 		}, "\n")), nil
 	}
@@ -77,13 +77,13 @@ func TestRemoveHostRemovesOnlyMarkedMatchingEntry(t *testing.T) {
 	if err := RemoveHost("myapp"); err != nil {
 		t.Fatalf("RemoveHost: %v", err)
 	}
-	if strings.Contains(wrote, "myapp.local # slim") {
+	if strings.Contains(wrote, "myapp.internal # slim") {
 		t.Fatalf("expected marked myapp entry to be removed, got %q", wrote)
 	}
-	if !strings.Contains(wrote, "myapp.local # another-tool") {
+	if !strings.Contains(wrote, "myapp.internal # another-tool") {
 		t.Fatalf("expected non-marked myapp entry to remain, got %q", wrote)
 	}
-	if !strings.Contains(wrote, "api.local # slim") {
+	if !strings.Contains(wrote, "api.internal # slim") {
 		t.Fatalf("expected other marked entries to remain, got %q", wrote)
 	}
 }
@@ -95,9 +95,9 @@ func TestRemoveAllHostsRemovesAllMarkedEntries(t *testing.T) {
 	readFileHostFn = func(string) ([]byte, error) {
 		return []byte(strings.Join([]string{
 			"127.0.0.1 localhost",
-			"127.0.0.1 myapp.local # slim",
-			"127.0.0.1 api.local # slim",
-			"127.0.0.1 other.local # another-tool",
+			"127.0.0.1 myapp.internal # slim",
+			"127.0.0.1 api.internal # slim",
+			"127.0.0.1 other.internal # another-tool",
 			"",
 		}, "\n")), nil
 	}
@@ -114,7 +114,7 @@ func TestRemoveAllHostsRemovesAllMarkedEntries(t *testing.T) {
 	if strings.Contains(wrote, "# slim") {
 		t.Fatalf("expected all slim marked lines removed, got %q", wrote)
 	}
-	if !strings.Contains(wrote, "other.local # another-tool") {
+	if !strings.Contains(wrote, "other.internal # another-tool") {
 		t.Fatalf("expected unrelated entries to remain, got %q", wrote)
 	}
 }

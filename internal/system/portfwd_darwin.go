@@ -81,15 +81,10 @@ func (d *darwinPortFwd) Enable() error {
 		return fmt.Errorf("loading pfctl rules: %s: %w", strings.TrimSpace(string(output)), err)
 	}
 
-	_ = os.WriteFile(pfStampPath(), []byte{}, 0644)
 	return nil
 }
 
 func (d *darwinPortFwd) EnsureLoaded() error {
-	if d.loadedSinceBoot() {
-		return nil
-	}
-
 	if output, err := exec.Command("sudo", "pfctl", "-e").CombinedOutput(); err != nil {
 		out := strings.TrimSpace(string(output))
 		if !isPFAlreadyEnabledOutput(out) {
@@ -103,43 +98,7 @@ func (d *darwinPortFwd) EnsureLoaded() error {
 		return fmt.Errorf("loading pfctl rules: %s: %w", strings.TrimSpace(string(output)), err)
 	}
 
-	_ = os.WriteFile(pfStampPath(), []byte{}, 0644)
 	return nil
-}
-
-func pfStampPath() string {
-	return config.Dir() + "/pf-loaded"
-}
-
-func (d *darwinPortFwd) loadedSinceBoot() bool {
-	info, err := os.Stat(pfStampPath())
-	if err != nil {
-		return false
-	}
-
-	out, err := exec.Command("sysctl", "-n", "kern.boottime").Output()
-	if err != nil {
-		return false
-	}
-
-	// Output format: { sec = 1709654321, usec = 0 } Thu Mar  5 ...
-	s := string(out)
-	start := strings.Index(s, "sec = ")
-	if start < 0 {
-		return false
-	}
-	s = s[start+6:]
-	end := strings.Index(s, ",")
-	if end < 0 {
-		return false
-	}
-
-	var bootSec int64
-	if _, err := fmt.Sscanf(s[:end], "%d", &bootSec); err != nil {
-		return false
-	}
-	bootTime := time.Unix(bootSec, 0)
-	return info.ModTime().After(bootTime)
 }
 
 func (d *darwinPortFwd) Disable() error {

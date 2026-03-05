@@ -20,7 +20,7 @@ func TestGetCertificateRejectsUnknownSNI(t *testing.T) {
 		certCache:    map[string]*tls.Certificate{},
 	}
 
-	_, err := s.getCertificate(&tls.ClientHelloInfo{ServerName: "other.local"})
+	_, err := s.getCertificate(&tls.ClientHelloInfo{ServerName: "other.internal"})
 	if err == nil {
 		t.Fatal("expected error for unknown SNI")
 	}
@@ -89,7 +89,7 @@ func TestGetCertificateUsesSingleflightOnCacheMiss(t *testing.T) {
 		wg.Add(1)
 		go func() {
 			defer wg.Done()
-			got, err := s.getCertificate(&tls.ClientHelloInfo{ServerName: "myapp.local"})
+			got, err := s.getCertificate(&tls.ClientHelloInfo{ServerName: "myapp.internal"})
 			if err != nil {
 				errCh <- err
 				return

@@ -21,6 +21,8 @@ var (
 	upAddHostFn           = system.AddHost
 	upEnsureLeafCertFn    = cert.EnsureLeafCert
 	upDaemonIsRunningFn   = daemon.IsRunning
+	upDaemonIsChildFn     = daemon.IsChild
+	upNewPortFwdFn        = system.NewPortForwarder
 	upEnsurePortsFn       = setup.EnsureProxyPortsAvailable
 	upDaemonRunDetachedFn = daemon.RunDetached
 	upDaemonWaitFn        = daemon.WaitForDaemon
@@ -98,6 +100,14 @@ then start all services defined in it.
 		}
 
 		if !upDaemonIsRunningFn() {
+			if !upDaemonIsChildFn() {
+				pf := upNewPortFwdFn()
+				if pf.IsEnabled() {
+					if err := pf.EnsureLoaded(); err != nil {
+						return fmt.Errorf("loading port forwarding rules: %w", err)
+					}
+				}
+			}
 			if err := upEnsurePortsFn(); err != nil {
 				return err
 			}

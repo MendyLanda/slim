@@ -23,7 +23,7 @@ $ slim down`;
     <p class="text-[11px] font-semibold uppercase tracking-[0.1em] text-primary mb-3">Local Development</p>
     <h2 class="font-heading text-[22px] font-medium tracking-[-0.02em] mb-1.5 text-text max-sm:text-xl">Local Domains with HTTPS</h2>
     <p class="text-text-tertiary text-sm mb-5 leading-[1.5]">
-      Map localhost ports to pretty <code class="bg-[hsl(0_0%_100%/8%)] px-[5px] py-px rounded-[3px] text-[12.5px] text-text-secondary">.local</code> domains with trusted certificates and zero config.
+      Map localhost ports to pretty <code class="bg-[hsl(0_0%_100%/8%)] px-[5px] py-px rounded-[3px] text-[12.5px] text-text-secondary">.internal</code> domains with trusted certificates and zero config.
     </p>
 
     <div class="flex gap-0 border-b border-border mb-0">
@@ -50,7 +50,7 @@ $ slim down`;
                 <span><span class="text-[#7dd3fc]">slim</span> start web <span class="text-[#60a5fa]">--port</span> <span class="text-[#fbbf24]">3000</span></span>
               </div>
               <div class="pl-4 whitespace-nowrap">
-                <span class="text-[#34d399]">&#10003;</span> <span class="text-[#34d399] font-medium">https://web.local</span> <span class="text-[#525252]">&rarr;</span> <span class="text-[#737373]">localhost:3000</span>
+                <span class="text-[#34d399]">&#10003;</span> <span class="text-[#34d399] font-medium">https://web.internal</span> <span class="text-[#525252]">&rarr;</span> <span class="text-[#737373]">localhost:3000</span>
               </div>
             </div>
           </div>
@@ -65,10 +65,10 @@ $ slim down`;
                 <span><span class="text-[#7dd3fc]">slim</span> start myapp <span class="text-[#60a5fa]">--port</span> <span class="text-[#fbbf24]">3000</span> <span class="text-[#60a5fa]">--route</span> <span class="text-[#fbbf24]">/api=8080</span></span>
               </div>
               <div class="pl-4 whitespace-nowrap">
-                <span class="text-[#34d399]">&#10003;</span> <span class="text-[#34d399] font-medium">https://myapp.local</span> &nbsp;&nbsp;&nbsp;<span class="text-[#525252]">&rarr;</span> <span class="text-[#737373]">localhost:3000</span>
+                <span class="text-[#34d399]">&#10003;</span> <span class="text-[#34d399] font-medium">https://myapp.internal</span> &nbsp;&nbsp;&nbsp;<span class="text-[#525252]">&rarr;</span> <span class="text-[#737373]">localhost:3000</span>
               </div>
               <div class="pl-4 whitespace-nowrap">
-                <span class="text-[#737373]">&nbsp;</span> <span class="text-[#fbbf24]">https://myapp.local/api</span> <span class="text-[#525252]">&rarr;</span> <span class="text-[#737373]">localhost:8080</span>
+                <span class="text-[#737373]">&nbsp;</span> <span class="text-[#fbbf24]">https://myapp.internal/api</span> <span class="text-[#525252]">&rarr;</span> <span class="text-[#737373]">localhost:8080</span>
               </div>
             </div>
           </div>

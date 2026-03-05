@@ -43,7 +43,7 @@ func stopOne(name string) error {
 		}
 
 		if _, idx := cfg.FindDomain(name); idx == -1 {
-			return fmt.Errorf("%s.local is not running", name)
+			return fmt.Errorf("%s.internal is not running", name)
 		}
 
 		if err := cfg.RemoveDomain(name); err != nil {
@@ -64,15 +64,15 @@ func stopOne(name string) error {
 			if _, err := daemonSendIPCFn(daemon.Request{Type: daemon.MsgShutdown}); err != nil {
 				return fmt.Errorf("stopping daemon: %w", err)
 			}
-			fmt.Printf("Stopped %s.local (daemon shut down)\n", name)
+			fmt.Printf("Stopped %s.internal (daemon shut down)\n", name)
 		} else {
 			if _, err := daemonSendIPCFn(daemon.Request{Type: daemon.MsgReload}); err != nil {
 				return fmt.Errorf("reloading daemon: %w", err)
 			}
-			fmt.Printf("Stopped %s.local\n", name)
+			fmt.Printf("Stopped %s.internal\n", name)
 		}
 	} else {
-		fmt.Printf("Stopped %s.local\n", name)
+		fmt.Printf("Stopped %s.internal\n", name)
 	}
 
 	return nil
@@ -103,7 +103,7 @@ func stopAll() error {
 
 	for _, d := range domains {
 		if err := systemRemoveHostFn(d.Name); err != nil {
-			fmt.Printf("Warning: failed to remove %s.local from /etc/hosts: %v\n", d.Name, err)
+			fmt.Printf("Warning: failed to remove %s.internal from /etc/hosts: %v\n", d.Name, err)
 		}
 	}
 

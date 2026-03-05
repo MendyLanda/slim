@@ -82,7 +82,7 @@ func TestCheckHostsFile(t *testing.T) {
 	defer restore()
 
 	readFileFn = func(path string) ([]byte, error) {
-		return []byte("127.0.0.1 myapp.local # slim\n"), nil
+		return []byte("127.0.0.1 myapp.internal # slim\n"), nil
 	}
 	r := checkHostsFile("myapp")
 	if r.Status != Pass {

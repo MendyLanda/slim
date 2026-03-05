@@ -13,22 +13,22 @@ func TestFormatLogLineMinimal(t *testing.T) {
 	}{
 		{
 			name:   "5xx status",
-			line:   "12:00:00\tmyapp.local\t500\t10ms",
+			line:   "12:00:00\tmyapp.internal\t500\t10ms",
 			status: "500",
 		},
 		{
 			name:   "4xx status",
-			line:   "12:00:00\tmyapp.local\t404\t10ms",
+			line:   "12:00:00\tmyapp.internal\t404\t10ms",
 			status: "404",
 		},
 		{
 			name:   "3xx status",
-			line:   "12:00:00\tmyapp.local\t301\t10ms",
+			line:   "12:00:00\tmyapp.internal\t301\t10ms",
 			status: "301",
 		},
 		{
 			name:   "2xx status",
-			line:   "12:00:00\tmyapp.local\t200\t10ms",
+			line:   "12:00:00\tmyapp.internal\t200\t10ms",
 			status: "200",
 		},
 	}
@@ -36,7 +36,7 @@ func TestFormatLogLineMinimal(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			got := formatLogLine(tt.line)
-			if !strings.Contains(got, "myapp.local") {
+			if !strings.Contains(got, "myapp.internal") {
 				t.Fatalf("expected domain in output, got: %q", got)
 			}
 			if !strings.Contains(got, tt.status) {
@@ -47,7 +47,7 @@ func TestFormatLogLineMinimal(t *testing.T) {
 }
 
 func TestFormatLogLineFull(t *testing.T) {
-	line := "12:00:00\tmyapp.local\tGET\t/api/health\t3000\t200\t12ms"
+	line := "12:00:00\tmyapp.internal\tGET\t/api/health\t3000\t200\t12ms"
 	got := formatLogLine(line)
 
 	if !strings.Contains(got, "GET") {

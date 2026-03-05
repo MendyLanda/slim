@@ -19,6 +19,10 @@ import (
 	"github.com/kamranahmedse/slim/internal/proxy"
 )
 
+func IsChild() bool {
+	return godaemon.WasReborn()
+}
+
 func IsRunning() bool {
 	_, err := os.Stat(config.SocketPath())
 	if err != nil {

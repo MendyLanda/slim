@@ -148,7 +148,7 @@ func (c *Config) SetDomain(name string, port int, routes []Route) error {
 func (c *Config) RemoveDomain(name string) error {
 	_, idx := c.FindDomain(name)
 	if idx == -1 {
-		return fmt.Errorf("domain %s.local not found", name)
+		return fmt.Errorf("domain %s.internal not found", name)
 	}
 	c.Domains = append(c.Domains[:idx], c.Domains[idx+1:]...)
 	return c.Save()

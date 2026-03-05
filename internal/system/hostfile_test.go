@@ -8,12 +8,12 @@ func TestLineHasHost(t *testing.T) {
 		hostname string
 		want     bool
 	}{
-		{"127.0.0.1 myapp.local # slim", "myapp.local", true},
-		{"127.0.0.1 other.local # slim", "myapp.local", false},
-		{"127.0.0.1 myapp.local.extra # slim", "myapp.local", false},
-		{"# comment", "myapp.local", false},
-		{"", "myapp.local", false},
-		{"127.0.0.1\tmyapp.local\t# slim", "myapp.local", true},
+		{"127.0.0.1 myapp.internal # slim", "myapp.internal", true},
+		{"127.0.0.1 other.internal # slim", "myapp.internal", false},
+		{"127.0.0.1 myapp.internal.extra # slim", "myapp.internal", false},
+		{"# comment", "myapp.internal", false},
+		{"", "myapp.internal", false},
+		{"127.0.0.1\tmyapp.internal\t# slim", "myapp.internal", true},
 	}
 
 	for _, tt := range tests {
@@ -25,15 +25,15 @@ func TestLineHasHost(t *testing.T) {
 }
 
 func TestHasMarkedEntry(t *testing.T) {
-	content := "127.0.0.1 localhost\n127.0.0.1 myapp.local # slim\n"
+	content := "127.0.0.1 localhost\n127.0.0.1 myapp.internal # slim\n"
 
-	if !HasMarkedEntry(content, "myapp.local") {
-		t.Error("expected to find marked entry for myapp.local")
+	if !HasMarkedEntry(content, "myapp.internal") {
+		t.Error("expected to find marked entry for myapp.internal")
 	}
-	if HasMarkedEntry(content, "other.local") {
-		t.Error("did not expect to find marked entry for other.local")
+	if HasMarkedEntry(content, "other.internal") {
+		t.Error("did not expect to find marked entry for other.internal")
 	}
-	if HasMarkedEntry("", "myapp.local") {
+	if HasMarkedEntry("", "myapp.internal") {
 		t.Error("did not expect to find entry in empty content")
 	}
 }

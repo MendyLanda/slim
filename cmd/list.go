@@ -84,7 +84,7 @@ var listCmd = &cobra.Command{
 		var domains []domainEntry
 		for _, d := range cfg.Domains {
 			entry := domainEntry{
-				Domain: d.Name + ".local",
+				Domain: d.Name + ".internal",
 				Port:   d.Port,
 			}
 			for _, r := range d.Routes {

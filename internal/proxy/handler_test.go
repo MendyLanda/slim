@@ -26,8 +26,8 @@ func TestBuildHandlerRoutesKnownDomain(t *testing.T) {
 		routes: map[string]*domainRouter{"myapp": {defaultPort: port, defaultHandler: newDomainProxy(port, newUpstreamTransport())}},
 	}
 
-	req := httptest.NewRequest(http.MethodGet, "https://myapp.local/health?x=1", nil)
-	req.Host = "myapp.local"
+	req := httptest.NewRequest(http.MethodGet, "https://myapp.internal/health?x=1", nil)
+	req.Host = "myapp.internal"
 	rr := httptest.NewRecorder()
 
 	buildHandler(s).ServeHTTP(rr, req)
@@ -41,8 +41,8 @@ func TestBuildHandlerRoutesKnownDomain(t *testing.T) {
 
 	select {
 	case gotHost := <-hostCh:
-		if gotHost != "myapp.local" {
-			t.Fatalf("expected upstream host %q, got %q", "myapp.local", gotHost)
+		if gotHost != "myapp.internal" {
+			t.Fatalf("expected upstream host %q, got %q", "myapp.internal", gotHost)
 		}
 	default:
 		t.Fatal("upstream request was not observed")
@@ -55,8 +55,8 @@ func TestBuildHandlerUnknownDomainReturnsNotFound(t *testing.T) {
 		routes: map[string]*domainRouter{},
 	}
 
-	req := httptest.NewRequest(http.MethodGet, "https://unknown.local/", nil)
-	req.Host = "unknown.local"
+	req := httptest.NewRequest(http.MethodGet, "https://unknown.internal/", nil)
+	req.Host = "unknown.internal"
 	rr := httptest.NewRecorder()
 
 	buildHandler(s).ServeHTTP(rr, req)
@@ -76,8 +76,8 @@ func TestBuildHandlerUpstreamDownReturnsBadGateway(t *testing.T) {
 		routes: map[string]*domainRouter{"myapp": {defaultPort: port, defaultHandler: newDomainProxy(port, newUpstreamTransport())}},
 	}
 
-	req := httptest.NewRequest(http.MethodGet, "https://myapp.local/", nil)
-	req.Host = "myapp.local"
+	req := httptest.NewRequest(http.MethodGet, "https://myapp.internal/", nil)
+	req.Host = "myapp.internal"
 	rr := httptest.NewRecorder()
 
 	buildHandler(s).ServeHTTP(rr, req)
@@ -85,7 +85,7 @@ func TestBuildHandlerUpstreamDownReturnsBadGateway(t *testing.T) {
 	if rr.Code != http.StatusBadGateway {
 		t.Fatalf("expected %d, got %d", http.StatusBadGateway, rr.Code)
 	}
-	if !strings.Contains(rr.Body.String(), "Waiting for myapp.local") {
+	if !strings.Contains(rr.Body.String(), "Waiting for myapp.internal") {
 		t.Fatalf("expected upstream-down page content, got %q", rr.Body.String())
 	}
 }
@@ -159,8 +159,8 @@ func TestPathRouteStripsPrefix(t *testing.T) {
 	}
 
 	for _, tt := range tests {
-		req := httptest.NewRequest(http.MethodGet, "https://myapp.local"+tt.reqPath, nil)
-		req.Host = "myapp.local"
+		req := httptest.NewRequest(http.MethodGet, "https://myapp.internal"+tt.reqPath, nil)
+		req.Host = "myapp.internal"
 		rr := httptest.NewRecorder()
 
 		buildHandler(s).ServeHTTP(rr, req)

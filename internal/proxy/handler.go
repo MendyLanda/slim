@@ -117,11 +117,11 @@ func normalizeHost(host string) string {
 
 func localDomainFromHost(host string) (string, bool) {
 	host = normalizeHost(host)
-	if !strings.HasSuffix(host, ".local") {
+	if !strings.HasSuffix(host, ".internal") {
 		return "", false
 	}
 
-	name := strings.TrimSuffix(host, ".local")
+	name := strings.TrimSuffix(host, ".internal")
 	return name, name != ""
 }
 

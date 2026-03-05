@@ -24,11 +24,11 @@ var startRoutes []string
 var startCmd = &cobra.Command{
 	Use:   "start [name] --port [port]",
 	Short: "Start proxying a domain",
-	Long: `Map a .local domain to a local port and start proxying.
+	Long: `Map a .internal domain to a local port and start proxying.
 Runs first-time setup automatically if needed.
 
   slim start myapp --port 3000
-  # https://myapp.local → localhost:3000`,
+  # https://myapp.internal → localhost:3000`,
 	Args: cobra.ExactArgs(1),
 	RunE: func(cmd *cobra.Command, args []string) error {
 		name := normalizeName(args[0])
@@ -76,10 +76,12 @@ Runs first-time setup automatically if needed.
 		}
 
 		if !daemon.IsRunning() {
-			pf := system.NewPortForwarder()
-			if pf.IsEnabled() {
-				if err := pf.EnsureLoaded(); err != nil {
-					return fmt.Errorf("loading port forwarding rules: %w", err)
+			if !daemon.IsChild() {
+				pf := system.NewPortForwarder()
+				if pf.IsEnabled() {
+					if err := pf.EnsureLoaded(); err != nil {
+						return fmt.Errorf("loading port forwarding rules: %w", err)
+					}
 				}
 			}
 			if err := setup.EnsureProxyPortsAvailable(); err != nil {

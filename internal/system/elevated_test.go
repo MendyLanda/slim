@@ -8,7 +8,7 @@ import (
 
 func TestWriteFileElevatedDirectWriteSuccess(t *testing.T) {
 	path := filepath.Join(t.TempDir(), "hosts.test")
-	content := "127.0.0.1 myapp.local # slim\n"
+	content := "127.0.0.1 myapp.internal # slim\n"
 
 	if err := writeFileElevated(path, content); err != nil {
 		t.Fatalf("writeFileElevated: %v", err)
