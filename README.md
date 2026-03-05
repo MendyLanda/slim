@@ -5,7 +5,7 @@
 <h1 align="center">Slim</h1>
 
 <p align="center">
-  Simple command to get a clean HTTPS <code>.internal</code> for your local projects
+  Simple command to get a clean HTTPS <code>.test</code> for your local projects
 </p>
 
 <p align="center">
@@ -15,9 +15,9 @@
 </p>
 
 ```
-myapp.internal        → localhost:3000
-myapp.internal/api    → localhost:8080
-dashboard.internal    → localhost:5173
+myapp.test        → localhost:3000
+myapp.test/api    → localhost:8080
+dashboard.test    → localhost:5173
 ```
 
 ## Install
@@ -43,7 +43,7 @@ Requires Go 1.25 or later to build from source.
 # Start your dev server, then:
 slim start myapp --port 3000
 
-# That's it. Open https://myapp.internal
+# That's it. Open https://myapp.test
 ```
 
 Or define all services in a `.slim.yaml` project config and start them at once:
@@ -140,9 +140,9 @@ $ slim doctor
   ✓  CA certificate        valid, expires 2035-02-28
   ✓  CA trust              trusted by OS
   ✓  Port forwarding       active (80→10080, 443→10443)
-  ✓  Hosts: myapp.internal    present in /etc/hosts
+  ✓  Hosts: myapp.test    present in /etc/hosts
   !  Daemon                not running
-  ✓  Cert: myapp.internal     valid, expires 2027-06-03
+  ✓  Cert: myapp.test     valid, expires 2027-06-03
 ```
 
 ### Uninstall

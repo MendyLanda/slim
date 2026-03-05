@@ -17,7 +17,7 @@ const installCmd = 'curl -sL https://slim.sh/install.sh | sh';
       Give your localhost a<br /><span class="text-[#34d399]">local</span> or <span class="text-[#a78bfa]">public</span> URL
     </h1>
     <p class="text-[15px] leading-[1.6] text-text-secondary mt-6 mb-8 max-w-115 max-sm:text-sm mx-auto">
-      Turn <code class="bg-[hsl(0_0%_100%/8%)] px-1.5 py-0.5 rounded text-[13px] text-text">localhost:3000</code> into <code class="bg-[hsl(0_0%_100%/8%)] px-1.5 py-0.5 rounded text-[13px] text-text">https://app.internal</code> with path routing, HTTPS, HMR support, or get a public url without deployment.
+      Turn <code class="bg-[hsl(0_0%_100%/8%)] px-1.5 py-0.5 rounded text-[13px] text-text">localhost:3000</code> into <code class="bg-[hsl(0_0%_100%/8%)] px-1.5 py-0.5 rounded text-[13px] text-text">https://app.test</code> with path routing, HTTPS, HMR support, or get a public url without deployment.
     </p>
 
     <div class="flex gap-0 mb-0">
@@ -47,7 +47,7 @@ const installCmd = 'curl -sL https://slim.sh/install.sh | sh';
             <span><span class="text-[#7dd3fc]">slim</span> start web <span class="text-[#60a5fa]">--port</span> <span class="text-[#fbbf24]">3000</span></span>
           </div>
           <div class="pl-4 whitespace-nowrap">
-            <span class="text-[#34d399]">&#10003;</span> <span class="text-[#34d399] font-medium">https://web.internal</span> <span class="text-[#525252]">&rarr;</span> <span class="text-[#737373]">localhost:3000</span>
+            <span class="text-[#34d399]">&#10003;</span> <span class="text-[#34d399] font-medium">https://web.test</span> <span class="text-[#525252]">&rarr;</span> <span class="text-[#737373]">localhost:3000</span>
           </div>
 
           <div class="flex gap-2 mt-3">
@@ -55,10 +55,10 @@ const installCmd = 'curl -sL https://slim.sh/install.sh | sh';
             <span><span class="text-[#7dd3fc]">slim</span> start myapp <span class="text-[#60a5fa]">--port</span> <span class="text-[#fbbf24]">3000</span> <span class="text-[#60a5fa]">--route</span> <span class="text-[#fbbf24]">/api=8080</span></span>
           </div>
           <div class="pl-4 whitespace-nowrap">
-            <span class="text-[#34d399]">&#10003;</span> <span class="text-[#34d399] font-medium">https://myapp.internal</span> &nbsp;&nbsp;&nbsp;<span class="text-[#525252]">&rarr;</span> <span class="text-[#737373]">localhost:3000</span>
+            <span class="text-[#34d399]">&#10003;</span> <span class="text-[#34d399] font-medium">https://myapp.test</span> &nbsp;&nbsp;&nbsp;<span class="text-[#525252]">&rarr;</span> <span class="text-[#737373]">localhost:3000</span>
           </div>
           <div class="pl-4 whitespace-nowrap">
-            <span class="text-[#737373]">&nbsp;</span> <span class="text-[#fbbf24]">https://myapp.internal/api</span> <span class="text-[#525252]">&rarr;</span> <span class="text-[#737373]">localhost:8080</span>
+            <span class="text-[#737373]">&nbsp;</span> <span class="text-[#fbbf24]">https://myapp.test/api</span> <span class="text-[#525252]">&rarr;</span> <span class="text-[#737373]">localhost:8080</span>
           </div>
 
           <div class="flex gap-2 mt-3">
@@ -66,13 +66,13 @@ const installCmd = 'curl -sL https://slim.sh/install.sh | sh';
             <span><span class="text-[#7dd3fc]">slim</span> up <span class="text-[#525252]">&nbsp;# .slim.yaml</span></span>
           </div>
           <div class="pl-4 whitespace-nowrap">
-            <span class="text-[#34d399]">&#10003;</span> <span class="text-[#34d399] font-medium">https://myapp.internal</span> &nbsp;&nbsp;&nbsp;<span class="text-[#525252]">&rarr;</span> <span class="text-[#737373]">localhost:3000</span>
+            <span class="text-[#34d399]">&#10003;</span> <span class="text-[#34d399] font-medium">https://myapp.test</span> &nbsp;&nbsp;&nbsp;<span class="text-[#525252]">&rarr;</span> <span class="text-[#737373]">localhost:3000</span>
           </div>
           <div class="pl-4 whitespace-nowrap">
-            <span class="text-[#737373]">&nbsp;</span> <span class="text-[#fbbf24]">https://myapp.internal/api</span> <span class="text-[#525252]">&rarr;</span> <span class="text-[#737373]">localhost:8080</span>
+            <span class="text-[#737373]">&nbsp;</span> <span class="text-[#fbbf24]">https://myapp.test/api</span> <span class="text-[#525252]">&rarr;</span> <span class="text-[#737373]">localhost:8080</span>
           </div>
           <div class="pl-4 whitespace-nowrap">
-            <span class="text-[#34d399]">&#10003;</span> <span class="text-[#34d399] font-medium">https://dashboard.internal</span> <span class="text-[#525252]">&rarr;</span> <span class="text-[#737373]">localhost:5173</span>
+            <span class="text-[#34d399]">&#10003;</span> <span class="text-[#34d399] font-medium">https://dashboard.test</span> <span class="text-[#525252]">&rarr;</span> <span class="text-[#737373]">localhost:5173</span>
           </div>
         </div>
       </div>

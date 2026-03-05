@@ -8,10 +8,10 @@ func TestNormalizeName(t *testing.T) {
 		want  string
 	}{
 		{input: "myapp", want: "myapp"},
-		{input: "myapp.internal", want: "myapp"},
-		{input: "myapp.internal.", want: "myapp"},
-		{input: "MYAPP.INTERNAL", want: "myapp"},
-		{input: "  myapp.internal  ", want: "myapp"},
+		{input: "myapp.test", want: "myapp"},
+		{input: "myapp.test.", want: "myapp"},
+		{input: "MYAPP.TEST", want: "myapp"},
+		{input: "  myapp.test  ", want: "myapp"},
 		{input: "my-app", want: "my-app"},
 	}
 

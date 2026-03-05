@@ -15,7 +15,7 @@ var (
 )
 
 func AddHost(name string) error {
-	hostname := name + ".internal"
+	hostname := name + ".test"
 	entry := fmt.Sprintf("127.0.0.1 %s %s", hostname, marker)
 
 	content, err := readFileHostFn(hostsPath)
@@ -32,7 +32,7 @@ func AddHost(name string) error {
 }
 
 func RemoveHost(name string) error {
-	hostname := name + ".internal"
+	hostname := name + ".test"
 
 	content, err := readFileHostFn(hostsPath)
 	if err != nil {

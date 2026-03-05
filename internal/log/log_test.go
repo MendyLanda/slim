@@ -15,7 +15,7 @@ func TestRequestWritesFullMode(t *testing.T) {
 	}
 	t.Cleanup(Close)
 
-	Request("myapp.internal", "GET", "/health", 3000, 200, 12*time.Millisecond)
+	Request("myapp.test", "GET", "/health", 3000, 200, 12*time.Millisecond)
 	Close()
 
 	data, err := os.ReadFile(path)
@@ -41,7 +41,7 @@ func TestRequestWritesMinimalMode(t *testing.T) {
 	}
 	t.Cleanup(Close)
 
-	Request("myapp.internal", "GET", "/health", 3000, 200, 12*time.Millisecond)
+	Request("myapp.test", "GET", "/health", 3000, 200, 12*time.Millisecond)
 	Close()
 
 	data, err := os.ReadFile(path)
@@ -67,7 +67,7 @@ func TestRequestOffModeWritesNothing(t *testing.T) {
 	}
 	t.Cleanup(Close)
 
-	Request("myapp.internal", "GET", "/health", 3000, 200, 12*time.Millisecond)
+	Request("myapp.test", "GET", "/health", 3000, 200, 12*time.Millisecond)
 	Close()
 
 	_, err := os.Stat(path)
@@ -83,11 +83,11 @@ func TestSetOutputReconfigureFlushesPreviousWriter(t *testing.T) {
 	}
 	t.Cleanup(Close)
 
-	Request("myapp.internal", "GET", "/one", 3000, 200, 10*time.Millisecond)
+	Request("myapp.test", "GET", "/one", 3000, 200, 10*time.Millisecond)
 	if err := SetOutput(path, "minimal"); err != nil {
 		t.Fatalf("SetOutput minimal: %v", err)
 	}
-	Request("myapp.internal", "GET", "/two", 3000, 200, 10*time.Millisecond)
+	Request("myapp.test", "GET", "/two", 3000, 200, 10*time.Millisecond)
 	Close()
 
 	data, err := os.ReadFile(path)

@@ -72,7 +72,7 @@ Other domains not in the project config are left running.
 
 		for _, svc := range pc.Services {
 			if err := downRemoveHostFn(svc.Domain); err != nil {
-				fmt.Printf("Warning: failed to remove %s.internal from /etc/hosts: %v\n", svc.Domain, err)
+				fmt.Printf("Warning: failed to remove %s.test from /etc/hosts: %v\n", svc.Domain, err)
 			}
 		}
 

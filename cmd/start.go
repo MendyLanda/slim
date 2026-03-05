@@ -24,11 +24,11 @@ var startRoutes []string
 var startCmd = &cobra.Command{
 	Use:   "start [name] --port [port]",
 	Short: "Start proxying a domain",
-	Long: `Map a .internal domain to a local port and start proxying.
+	Long: `Map a .test domain to a local port and start proxying.
 Runs first-time setup automatically if needed.
 
   slim start myapp --port 3000
-  # https://myapp.internal → localhost:3000`,
+  # https://myapp.test → localhost:3000`,
 	Args: cobra.ExactArgs(1),
 	RunE: func(cmd *cobra.Command, args []string) error {
 		name := normalizeName(args[0])

@@ -56,7 +56,7 @@ func GenerateLeafCert(name string) error {
 		return fmt.Errorf("generating serial: %w", err)
 	}
 
-	hostname := name + ".internal"
+	hostname := name + ".test"
 	template := &x509.Certificate{
 		SerialNumber: serial,
 		Subject: pkix.Name{
