@@ -72,6 +72,9 @@ slim up --config /path/to/.slim.yaml
 # Access logs: full | minimal | off
 slim start myapp --port 3000 --log-mode minimal
 
+# Enable CORS headers
+slim start myapp --port 3000 --cors
+
 # Wait for upstream readiness before returning
 slim start myapp --port 3000 --wait --timeout 30s
 
@@ -86,6 +89,12 @@ slim logs --flush
 
 # Run diagnostic checks
 slim doctor
+
+# Share your local server over the internet
+slim share --port 3000
+slim share --port 3000 --subdomain demo
+slim share --port 3000 --password secret --ttl 30m
+slim share --port 3000 --domain myapp.example.com
 
 # Stop proxying one or all
 slim stop myapp
@@ -145,6 +154,20 @@ $ slim doctor
   ✓  Cert: myapp.test     valid, expires 2027-06-03
 ```
 
+### Internet Sharing
+
+Expose a local server to the internet with a public `slim.show` URL. Requires `slim login` first.
+
+```bash
+slim share --port 3000                              # random subdomain
+slim share --port 3000 --subdomain demo             # https://demo.slim.show
+slim share --port 3000 --password secret            # password protected
+slim share --port 3000 --ttl 30m                    # auto-expires after 30 minutes
+slim share --port 3000 --domain myapp.example.com   # custom domain
+```
+
+Custom subdomains, custom domains, and password protection require a Pro subscription.
+
 ### Uninstall
 
 ```bash
@@ -154,14 +177,25 @@ slim uninstall   # removes everything: CA, certs, hosts entries, port-forward ru
 ## How It Works
 
 - **HTTPS**: A root CA is generated on first use and trusted in the system trust store (macOS Keychain or Linux CA store). Per-domain leaf certificates are created on demand and served via SNI.
-- **Reverse proxy**: Go's `httputil.ReverseProxy` handles HTTP/2, WebSocket upgrades, and CORS natively — HMR for Next.js, Vite, etc. works out of the box.
+- **Reverse proxy**: Go's `httputil.ReverseProxy` handles HTTP/2 and WebSocket upgrades natively — HMR for Next.js, Vite, etc. works out of the box.
 - **Local resolution**: `/etc/hosts` entries are managed automatically.
 - **Port forwarding**: macOS `pfctl` or Linux `iptables` redirects ports 80/443 to unprivileged 10080/10443 so the proxy doesn't need root.
 - **Daemon**: The proxy runs in the background. `start` launches it automatically, `stop` shuts it down.
+- **Sharing**: `slim share` creates a WebSocket tunnel to `slim.show`, giving your local server a public HTTPS URL with optional password protection and TTL.
 
 ## Configuration
 
 Config lives at `~/.slim/config.yaml`. Certificates in `~/.slim/certs/`, root CA in `~/.slim/ca/`, logs in `~/.slim/access.log`.
+
+### CORS
+
+If you need Slim to handle CORS headers, add `cors: true` to your `.slim.yaml`:
+
+```yaml
+cors: true
+```
+
+### Access Logging
 
 Set access logging mode globally (persisted in config) with:
 

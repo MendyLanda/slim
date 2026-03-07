@@ -17,6 +17,7 @@ import (
 
 var startPort int
 var startLogMode string
+var startCors bool
 var startWait bool
 var startWaitTimeout time.Duration
 var startRoutes []string
@@ -58,6 +59,9 @@ Runs first-time setup automatically if needed.
 			cfg, err := config.Load()
 			if err != nil {
 				return err
+			}
+			if cmd.Flags().Changed("cors") {
+				cfg.Cors = startCors
 			}
 			if startLogMode != "" {
 				cfg.LogMode = strings.ToLower(strings.TrimSpace(startLogMode))
@@ -165,6 +169,7 @@ func init() {
 	startCmd.Flags().IntVarP(&startPort, "port", "p", 0, "Local port to proxy to (required)")
 	startCmd.Flags().StringArrayVar(&startRoutes, "route", nil, "Route a path to a different port (e.g. /api=8080), repeatable")
 	startCmd.Flags().StringVar(&startLogMode, "log-mode", "", "Access log mode: full|minimal|off")
+	startCmd.Flags().BoolVar(&startCors, "cors", false, "Enable CORS headers on proxied responses")
 	startCmd.Flags().BoolVar(&startWait, "wait", false, "Wait for the upstream app to become reachable before returning")
 	startCmd.Flags().DurationVar(&startWaitTimeout, "timeout", 30*time.Second, "Maximum time to wait for upstream with --wait")
 	_ = startCmd.MarkFlagRequired("port")
