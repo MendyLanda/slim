@@ -49,6 +49,14 @@ const canonicalUrl = new URL(Astro.url.pathname, Astro.site).href;
     <meta name="twitter:image" content={new URL('/og-img.png', Astro.site).href} />
 
     <link rel="icon" href="/favicon.png" type="image/png" />
+
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-34BX59VD6M"></script>
+    <script is:inline>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+      gtag('config', 'G-34BX59VD6M');
+    </script>
   </head>
   <body>
     <div class="pointer-events-none fixed inset-y-0 left-1/2 -translate-x-1/2 z-[101] w-full max-w-[calc(var(--max-width)+var(--padding-x)*2)] border-x border-border" aria-hidden="true"></div>
