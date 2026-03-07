@@ -12,6 +12,7 @@ import (
 	"github.com/kamranahmedse/slim/internal/config"
 	"github.com/kamranahmedse/slim/internal/daemon"
 	"github.com/kamranahmedse/slim/internal/proxy"
+	"github.com/kamranahmedse/slim/internal/system"
 	"github.com/kamranahmedse/slim/internal/term"
 	"github.com/spf13/cobra"
 )
@@ -67,6 +68,17 @@ var listCmd = &cobra.Command{
 		}
 
 		running := daemon.IsRunning()
+		ingressOK := true
+		var pfReloadErr error
+		if running {
+			pf := system.NewPortForwarder()
+			if shouldReloadPortForwarding(pf, true) {
+				if err := pf.EnsureLoaded(); err != nil {
+					pfReloadErr = err
+				}
+			}
+			ingressOK = ingressPortsReachable()
+		}
 
 		type routeEntry struct {
 			Path    string `json:"path"`
@@ -111,6 +123,15 @@ var listCmd = &cobra.Command{
 					idx++
 				}
 			}
+			if !ingressOK {
+				for i := range domains {
+					down := false
+					domains[i].Healthy = &down
+					for j := range domains[i].Routes {
+						domains[i].Routes[j].Healthy = &down
+					}
+				}
+			}
 		}
 
 		info, _ := auth.LoadAuth()
@@ -141,7 +162,9 @@ var listCmd = &cobra.Command{
 			for _, e := range domains {
 				status := term.Dim.Render("-")
 				if e.Healthy != nil {
-					if *e.Healthy {
+					if running && !ingressOK {
+						status = term.Red.Render("● ingress down")
+					} else if *e.Healthy {
 						status = term.Green.Render("● reachable")
 					} else {
 						status = term.Red.Render("● unreachable")
@@ -151,7 +174,9 @@ var listCmd = &cobra.Command{
 				for _, r := range e.Routes {
 					rStatus := term.Dim.Render("-")
 					if r.Healthy != nil {
-						if *r.Healthy {
+						if running && !ingressOK {
+							rStatus = term.Red.Render("● ingress down")
+						} else if *r.Healthy {
 							rStatus = term.Green.Render("● reachable")
 						} else {
 							rStatus = term.Red.Render("● unreachable")
@@ -178,6 +203,10 @@ var listCmd = &cobra.Command{
 					return s
 				})
 			fmt.Println(t)
+		}
+
+		if pfReloadErr != nil {
+			fmt.Printf("\n%s %v\n", term.Yellow.Render("Port forwarding reload failed:"), pfReloadErr)
 		}
 
 		if len(tunnels) > 0 {

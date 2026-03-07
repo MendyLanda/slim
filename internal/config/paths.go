@@ -66,3 +66,7 @@ func TunnelTokenPath() string {
 func AuthPath() string {
 	return filepath.Join(Dir(), "auth.json")
 }
+
+func PFTokenPath() string {
+	return filepath.Join(Dir(), "pf.token")
+}

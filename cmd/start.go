@@ -77,7 +77,7 @@ Runs first-time setup automatically if needed.
 
 		if !daemon.IsChild() {
 			pf := system.NewPortForwarder()
-			if pf.IsEnabled() && !pf.IsLoaded() {
+			if shouldReloadPortForwarding(pf, daemon.IsRunning()) {
 				if err := pf.EnsureLoaded(); err != nil {
 					return fmt.Errorf("loading port forwarding rules: %w", err)
 				}
@@ -97,6 +97,15 @@ Runs first-time setup automatically if needed.
 		} else {
 			if _, err := daemon.SendIPC(daemon.Request{Type: daemon.MsgReload}); err != nil {
 				return fmt.Errorf("reloading daemon: %w", err)
+			}
+		}
+
+		if !daemon.IsChild() {
+			pf := system.NewPortForwarder()
+			if shouldReloadPortForwarding(pf, true) {
+				if err := pf.EnsureLoaded(); err != nil {
+					return fmt.Errorf("loading port forwarding rules: %w", err)
+				}
 			}
 		}
 

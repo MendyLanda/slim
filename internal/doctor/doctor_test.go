@@ -7,7 +7,9 @@ import (
 	"crypto/x509"
 	"crypto/x509/pkix"
 	"encoding/pem"
+	"errors"
 	"math/big"
+	"net"
 	"os"
 	"path/filepath"
 	"testing"
@@ -31,6 +33,7 @@ func setupDoctorTest(t *testing.T) func() {
 	prevDaemonIPC := daemonSendIPCFn
 	prevPortFwd := newPortFwdFn
 	prevConfigLoad := configLoadFn
+	prevDialTimeout := dialTimeoutFn
 
 	return func() {
 		readFileFn = prevReadFile
@@ -38,6 +41,7 @@ func setupDoctorTest(t *testing.T) func() {
 		daemonSendIPCFn = prevDaemonIPC
 		newPortFwdFn = prevPortFwd
 		configLoadFn = prevConfigLoad
+		dialTimeoutFn = prevDialTimeout
 	}
 }
 
@@ -48,15 +52,20 @@ type mockPortFwd struct {
 
 func (m *mockPortFwd) Enable() error       { return nil }
 func (m *mockPortFwd) Disable() error      { return nil }
-func (m *mockPortFwd) IsEnabled() bool      { return m.enabled }
-func (m *mockPortFwd) IsLoaded() bool       { return m.loaded }
-func (m *mockPortFwd) EnsureLoaded() error  { return nil }
+func (m *mockPortFwd) IsEnabled() bool     { return m.enabled }
+func (m *mockPortFwd) IsLoaded() bool      { return m.loaded }
+func (m *mockPortFwd) EnsureLoaded() error { return nil }
 
 func TestCheckPortForwarding(t *testing.T) {
 	restore := setupDoctorTest(t)
 	defer restore()
 
 	daemonIsRunningFn = func() bool { return true }
+	dialTimeoutFn = func(network, address string, timeout time.Duration) (net.Conn, error) {
+		client, server := net.Pipe()
+		_ = server.Close()
+		return client, nil
+	}
 
 	newPortFwdFn = func() system.PortForwarder { return &mockPortFwd{enabled: true, loaded: true} }
 	r := checkPortForwarding()
@@ -80,6 +89,16 @@ func TestCheckPortForwarding(t *testing.T) {
 	r = checkPortForwarding()
 	if r.Status != Warn {
 		t.Fatalf("expected Warn for enabled but not loaded when daemon is stopped, got %v: %s", r.Status, r.Message)
+	}
+
+	daemonIsRunningFn = func() bool { return true }
+	newPortFwdFn = func() system.PortForwarder { return &mockPortFwd{enabled: true, loaded: true} }
+	dialTimeoutFn = func(network, address string, timeout time.Duration) (net.Conn, error) {
+		return nil, errors.New("connection refused")
+	}
+	r = checkPortForwarding()
+	if r.Status != Fail {
+		t.Fatalf("expected Fail when ingress ports are unreachable, got %v: %s", r.Status, r.Message)
 	}
 }
 

@@ -4,7 +4,9 @@ import (
 	"crypto/x509"
 	"encoding/pem"
 	"fmt"
+	"net"
 	"os"
+	"strings"
 	"time"
 
 	"github.com/kamranahmedse/slim/internal/cert"
@@ -37,6 +39,7 @@ var (
 	daemonSendIPCFn   = daemon.SendIPC
 	newPortFwdFn      = system.NewPortForwarder
 	configLoadFn      = config.Load
+	dialTimeoutFn     = net.DialTimeout
 )
 
 func Run() Report {
@@ -109,7 +112,31 @@ func checkPortForwarding() CheckResult {
 		}
 		return CheckResult{Name: name, Status: Warn, Message: "configured but inactive (run: sudo pfctl -e && sudo pfctl -f /etc/pf.conf)"}
 	}
+	if daemonIsRunningFn() {
+		missing := missingIngressPorts()
+		if len(missing) > 0 {
+			return CheckResult{
+				Name:    name,
+				Status:  Fail,
+				Message: fmt.Sprintf("configured but local ingress is down on %s (run: sudo pfctl -e && sudo pfctl -f /etc/pf.conf)", strings.Join(missing, ", ")),
+			}
+		}
+	}
 	return CheckResult{Name: name, Status: Pass, Message: fmt.Sprintf("active (80→%d, 443→%d)", config.ProxyHTTPPort, config.ProxyHTTPSPort)}
+}
+
+func missingIngressPorts() []string {
+	ports := []int{80, 443}
+	var missing []string
+	for _, port := range ports {
+		conn, err := dialTimeoutFn("tcp", fmt.Sprintf("127.0.0.1:%d", port), 500*time.Millisecond)
+		if err != nil {
+			missing = append(missing, fmt.Sprintf("%d", port))
+			continue
+		}
+		_ = conn.Close()
+	}
+	return missing
 }
 
 func checkHostsFile(domain string) CheckResult {
