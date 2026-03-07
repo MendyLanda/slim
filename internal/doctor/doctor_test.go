@@ -75,6 +75,12 @@ func TestCheckPortForwarding(t *testing.T) {
 	if r.Status != Fail {
 		t.Fatalf("expected Fail for enabled but not loaded, got %v: %s", r.Status, r.Message)
 	}
+
+	daemonIsRunningFn = func() bool { return false }
+	r = checkPortForwarding()
+	if r.Status != Warn {
+		t.Fatalf("expected Warn for enabled but not loaded when daemon is stopped, got %v: %s", r.Status, r.Message)
+	}
 }
 
 func TestCheckHostsFile(t *testing.T) {

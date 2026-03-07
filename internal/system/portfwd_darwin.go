@@ -83,20 +83,9 @@ func (d *darwinPortFwd) Enable() error {
 }
 
 func (d *darwinPortFwd) EnsureLoaded() error {
-	if output, err := exec.Command("sudo", "pfctl", "-e").CombinedOutput(); err != nil {
-		out := strings.TrimSpace(string(output))
-		if !isPFAlreadyEnabledOutput(out) {
-			return fmt.Errorf("enabling pfctl: %s: %w", out, err)
-		}
-	}
-
-	cmd := exec.Command("sudo", "pfctl", "-f", "/etc/pf.conf")
-	output, err := cmd.CombinedOutput()
-	if err != nil {
-		return fmt.Errorf("loading pfctl rules: %s: %w", strings.TrimSpace(string(output)), err)
-	}
-
-	return nil
+	// Reuse full enable flow so missing anchor wiring in pf.conf is repaired,
+	// not just reloaded.
+	return d.Enable()
 }
 
 func (d *darwinPortFwd) Disable() error {
@@ -134,6 +123,14 @@ func (d *darwinPortFwd) IsEnabled() bool {
 }
 
 func (d *darwinPortFwd) IsLoaded() bool {
+	infoOutput, err := exec.Command("sudo", "pfctl", "-s", "info").CombinedOutput()
+	if err != nil {
+		return false
+	}
+	if !isPFEnabledInfoOutput(string(infoOutput)) {
+		return false
+	}
+
 	output, err := exec.Command("sudo", "pfctl", "-a", anchorName, "-s", "nat").CombinedOutput()
 	if err != nil {
 		return false
@@ -144,4 +141,8 @@ func (d *darwinPortFwd) IsLoaded() bool {
 
 func isPFAlreadyEnabledOutput(out string) bool {
 	return strings.Contains(strings.ToLower(out), "pf already enabled")
+}
+
+func isPFEnabledInfoOutput(out string) bool {
+	return strings.Contains(strings.ToLower(out), "status: enabled")
 }
