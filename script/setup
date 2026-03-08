@@ -1,0 +1,142 @@
+#!/usr/bin/env bash
+#
+# script/setup - Set up the development environment for Slim
+#
+# Usage: script/setup
+#
+set -euo pipefail
+
+RED='\033[0;31m'
+GREEN='\033[0;32m'
+YELLOW='\033[0;33m'
+BOLD='\033[1m'
+RESET='\033[0m'
+
+info()  { printf "${BOLD}==> %s${RESET}\n" "$1"; }
+ok()    { printf "${GREEN}  ✓ %s${RESET}\n" "$1"; }
+warn()  { printf "${YELLOW}  ! %s${RESET}\n" "$1"; }
+fail()  { printf "${RED}  ✗ %s${RESET}\n" "$1"; }
+
+errors=0
+
+# ---------- Go ----------
+info "Checking Go installation"
+
+required_go="1.25"
+
+go_meets_version() {
+  command -v go &>/dev/null || return 1
+  local ver
+  ver=$(go version | grep -oE 'go[0-9]+\.[0-9]+' | head -1 | sed 's/go//')
+  local major=${ver%%.*}
+  local minor=${ver#*.}
+  [ "$major" -gt 1 ] || { [ "$major" -eq 1 ] && [ "$minor" -ge 25 ]; }
+}
+
+install_go() {
+  if [[ "$(uname)" == "Darwin" ]]; then
+    if command -v brew &>/dev/null; then
+      info "Installing Go via Homebrew"
+      brew install go || brew upgrade go
+    else
+      fail "Homebrew not found — install Go ${required_go}+ manually from https://go.dev/dl/"
+      exit 1
+    fi
+  elif [[ "$(uname)" == "Linux" ]]; then
+    local arch
+    arch=$(uname -m)
+    case "$arch" in
+      x86_64)  arch="amd64" ;;
+      aarch64) arch="arm64" ;;
+      *)       fail "Unsupported architecture: $arch"; exit 1 ;;
+    esac
+    local tarball="go${required_go}.0.linux-${arch}.tar.gz"
+    local url="https://go.dev/dl/${tarball}"
+    info "Downloading Go ${required_go} from go.dev"
+    curl -fsSL "$url" -o "/tmp/${tarball}"
+    warn "Installing to /usr/local (requires sudo)"
+    sudo rm -rf /usr/local/go
+    sudo tar -C /usr/local -xzf "/tmp/${tarball}"
+    rm -f "/tmp/${tarball}"
+    export PATH="/usr/local/go/bin:$PATH"
+  else
+    fail "Unsupported OS: $(uname) — install Go ${required_go}+ manually from https://go.dev/dl/"
+    exit 1
+  fi
+}
+
+if go_meets_version; then
+  ok "Go $(go version | grep -oE 'go[0-9]+\.[0-9]+' | head -1 | sed 's/go//')"
+else
+  if command -v go &>/dev/null; then
+    warn "Go $(go version | grep -oE 'go[0-9]+\.[0-9]+' | head -1 | sed 's/go//') found, but ${required_go}+ is required"
+  else
+    warn "Go is not installed"
+  fi
+  install_go
+  if go_meets_version; then
+    ok "Go $(go version | grep -oE 'go[0-9]+\.[0-9]+' | head -1 | sed 's/go//') installed"
+  else
+    fail "Go installation failed — please install Go ${required_go}+ manually from https://go.dev/dl/"
+    exit 1
+  fi
+fi
+
+# ---------- golangci-lint (optional) ----------
+info "Checking golangci-lint (used in CI)"
+
+if ! command -v golangci-lint &>/dev/null; then
+  warn "golangci-lint not found — installing"
+  go install github.com/golangci/golangci-lint/cmd/golangci-lint@latest && \
+    ok "Installed golangci-lint" || \
+    { warn "Could not install golangci-lint (optional, but used in CI)"; }
+else
+  ok "golangci-lint $(golangci-lint --version 2>/dev/null | grep -oE '[0-9]+\.[0-9]+\.[0-9]+' | head -1)"
+fi
+
+# ---------- Dependencies ----------
+info "Downloading Go module dependencies"
+
+go mod download && ok "Dependencies downloaded" || {
+  fail "go mod download failed"
+  errors=$((errors + 1))
+}
+
+# ---------- Build ----------
+info "Verifying the project builds"
+
+go build ./... && ok "Build succeeded" || {
+  fail "Build failed"
+  errors=$((errors + 1))
+}
+
+# ---------- Vet ----------
+info "Running go vet"
+
+go vet ./... && ok "Vet passed" || {
+  fail "go vet found issues"
+  errors=$((errors + 1))
+}
+
+# ---------- Tests ----------
+info "Running tests"
+
+go test ./... && ok "Tests passed" || {
+  fail "Some tests failed"
+  errors=$((errors + 1))
+}
+
+# ---------- Summary ----------
+echo ""
+if [ "$errors" -gt 0 ]; then
+  fail "${errors} issue(s) found — see above for details"
+  exit 1
+else
+  echo -e "${GREEN}${BOLD}All good! You're ready to develop Slim.${RESET}"
+  echo ""
+  echo "  Common commands:"
+  echo "    make build     Build the binary"
+  echo "    make test      Run tests"
+  echo "    make install   Build and install to /usr/local/bin"
+  echo ""
+fi
