@@ -61,6 +61,9 @@ First run handles all setup automatically (CA generation, keychain trust, port f
 slim start myapp --port 3000
 slim start api --port 8080
 
+# Use a custom base domain instead of the default .test suffix
+slim start myapp --port 3000 --domain local.example.com
+
 # Route different paths to different upstream ports
 slim start myapp --port 3000 --route /api=8080 --route /ws=9000
 
@@ -85,6 +88,7 @@ slim list --json
 # Access logs with or without tail
 slim logs
 slim logs --follow myapp
+slim logs myapp.local.example.com
 slim logs --flush
 
 # Run diagnostic checks
@@ -123,6 +127,7 @@ Routes use longest-prefix matching — `/api/users` matches `/api` before `/`. T
 Define all services for a project in a `.slim.yaml` file at the project root:
 
 ```yaml
+base_domain: local.example.com
 services:
   - domain: myapp
     port: 3000
@@ -131,6 +136,9 @@ services:
         port: 8080
   - domain: dashboard
     port: 5173
+  - domain: preview
+    base_domain: preview.example.com
+    port: 4000
 log_mode: minimal
 ```
 

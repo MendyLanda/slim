@@ -7,6 +7,9 @@ $ slim start myapp --port 3000
 # Add your API server
 $ slim start api -p 8080
 
+# Use a custom base domain instead of .test
+$ slim start myapp -p 3000 --domain local.example.com
+
 # Route /api requests to a different port
 $ slim start myapp -p 3000 --route /api=8080
 

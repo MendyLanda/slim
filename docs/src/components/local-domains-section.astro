@@ -1,7 +1,8 @@
 ---
 import CommandCode from './command-code.astro';
 
-const yamlExample = `services:
+const yamlExample = `base_domain: local.example.com
+services:
   - domain: myapp
     port: 3000
     routes:
@@ -9,6 +10,9 @@ const yamlExample = `services:
         port: 8080
   - domain: dashboard
     port: 5173
+  - domain: preview
+    base_domain: preview.example.com
+    port: 4000
 log_mode: minimal`;
 
 const upDownCode = `# Start all services defined in .slim.yaml
