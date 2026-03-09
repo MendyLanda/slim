@@ -89,9 +89,6 @@ Runs first-time setup automatically if needed.
 		}
 
 		if !daemon.IsRunning() {
-			if err := setup.EnsureProxyPortsAvailable(); err != nil {
-				return err
-			}
 			if err := daemon.RunDetached(); err != nil {
 				return fmt.Errorf("starting daemon: %w", err)
 			}

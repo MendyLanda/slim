@@ -12,6 +12,7 @@ import (
 	"github.com/kamranahmedse/slim/internal/cert"
 	"github.com/kamranahmedse/slim/internal/config"
 	"github.com/kamranahmedse/slim/internal/daemon"
+	"github.com/kamranahmedse/slim/internal/proxy"
 	"github.com/kamranahmedse/slim/internal/system"
 )
 
@@ -122,7 +123,11 @@ func checkPortForwarding() CheckResult {
 			}
 		}
 	}
-	return CheckResult{Name: name, Status: Pass, Message: fmt.Sprintf("active (80→%d, 443→%d)", config.ProxyHTTPPort, config.ProxyHTTPSPort)}
+	httpPort, httpsPort, err := proxy.ReadProxyPorts()
+	if err != nil {
+		return CheckResult{Name: name, Status: Pass, Message: "active"}
+	}
+	return CheckResult{Name: name, Status: Pass, Message: fmt.Sprintf("active (80→%d, 443→%d)", httpPort, httpsPort)}
 }
 
 func missingIngressPorts() []string {

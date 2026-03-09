@@ -10,6 +10,10 @@ import (
 	"sync"
 	"time"
 
+	"os"
+	"strconv"
+	"strings"
+
 	"github.com/kamranahmedse/slim/internal/cert"
 	"github.com/kamranahmedse/slim/internal/config"
 	"github.com/kamranahmedse/slim/internal/log"
@@ -18,8 +22,8 @@ import (
 )
 
 var (
-	HTTPAddr  = fmt.Sprintf(":%d", config.ProxyHTTPPort)
-	HTTPSAddr = fmt.Sprintf(":%d", config.ProxyHTTPSPort)
+	HTTPAddr  = ":0"
+	HTTPSAddr = ":0"
 
 	ensureLeafCertFn = cert.EnsureLeafCert
 	loadLeafTLSFn    = cert.LoadLeafTLS
@@ -153,8 +157,16 @@ func (s *Server) Start() error {
 
 	tlsLn = tls.NewListener(tlsLn, s.tlsServer.TLSConfig)
 
-	log.Info("HTTP  listening on %s (redirects to HTTPS)", s.httpAddr)
-	log.Info("HTTPS listening on %s", s.httpsAddr)
+	httpPort := httpLn.Addr().(*net.TCPAddr).Port
+	httpsPort := tlsLn.Addr().(*net.TCPAddr).Port
+	if err := WriteProxyPorts(httpPort, httpsPort); err != nil {
+		httpLn.Close()
+		tlsLn.Close()
+		return fmt.Errorf("writing proxy ports: %w", err)
+	}
+
+	log.Info("HTTP  listening on %s (redirects to HTTPS)", httpLn.Addr())
+	log.Info("HTTPS listening on %s", tlsLn.Addr())
 
 	s.cfgMu.RLock()
 	domains := append([]config.Domain(nil), s.cfg.Domains...)
@@ -281,6 +293,39 @@ func (s *Server) defaultConfiguredDomain() string {
 	s.cfgMu.RLock()
 	defer s.cfgMu.RUnlock()
 	return s.defaultDomain
+}
+
+// WriteProxyPorts persists the OS-assigned proxy ports so port forwarding can
+// read them.
+func WriteProxyPorts(httpPort, httpsPort int) error {
+	data := fmt.Sprintf("%d %d\n", httpPort, httpsPort)
+	return os.WriteFile(config.ProxyPortsPath(), []byte(data), 0644)
+}
+
+// ReadProxyPorts returns the HTTP and HTTPS ports the proxy is listening on.
+func ReadProxyPorts() (httpPort, httpsPort int, err error) {
+	data, err := os.ReadFile(config.ProxyPortsPath())
+	if err != nil {
+		return 0, 0, err
+	}
+	parts := strings.Fields(strings.TrimSpace(string(data)))
+	if len(parts) != 2 {
+		return 0, 0, fmt.Errorf("invalid proxy ports file")
+	}
+	httpPort, err = strconv.Atoi(parts[0])
+	if err != nil {
+		return 0, 0, fmt.Errorf("invalid HTTP port: %w", err)
+	}
+	httpsPort, err = strconv.Atoi(parts[1])
+	if err != nil {
+		return 0, 0, fmt.Errorf("invalid HTTPS port: %w", err)
+	}
+	return httpPort, httpsPort, nil
+}
+
+// RemoveProxyPorts cleans up the proxy ports file.
+func RemoveProxyPorts() {
+	_ = os.Remove(config.ProxyPortsPath())
 }
 
 func newUpstreamTransport() *http.Transport {

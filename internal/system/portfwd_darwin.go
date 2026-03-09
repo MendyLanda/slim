@@ -9,13 +9,20 @@ import (
 	"strings"
 
 	"github.com/kamranahmedse/slim/internal/config"
+	"github.com/kamranahmedse/slim/internal/proxy"
 )
 
 const anchorName = "com.slim"
 const anchorFile = "/etc/pf.anchors/com.slim"
 
-var pfRules = fmt.Sprintf("rdr pass on lo0 inet proto tcp from any to 127.0.0.1 port 80 -> 127.0.0.1 port %d\nrdr pass on lo0 inet proto tcp from any to 127.0.0.1 port 443 -> 127.0.0.1 port %d\n",
-	config.ProxyHTTPPort, config.ProxyHTTPSPort)
+func pfRules() string {
+	httpPort, httpsPort, err := proxy.ReadProxyPorts()
+	if err != nil {
+		httpPort, httpsPort = 0, 0
+	}
+	return fmt.Sprintf("rdr pass on lo0 inet proto tcp from any to 127.0.0.1 port 80 -> 127.0.0.1 port %d\nrdr pass on lo0 inet proto tcp from any to 127.0.0.1 port 443 -> 127.0.0.1 port %d\n",
+		httpPort, httpsPort)
+}
 
 var (
 	readPFTokenFn   = os.ReadFile
@@ -30,7 +37,7 @@ func NewPortForwarder() PortForwarder {
 }
 
 func (d *darwinPortFwd) Enable() error {
-	if err := writeFileElevated(anchorFile, pfRules); err != nil {
+	if err := writeFileElevated(anchorFile, pfRules()); err != nil {
 		return fmt.Errorf("writing pf anchor: %w", err)
 	}
 

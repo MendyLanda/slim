@@ -23,7 +23,6 @@ var (
 	upDaemonIsRunningFn   = daemon.IsRunning
 	upDaemonIsChildFn     = daemon.IsChild
 	upNewPortFwdFn        = system.NewPortForwarder
-	upEnsurePortsFn       = setup.EnsureProxyPortsAvailable
 	upDaemonRunDetachedFn = daemon.RunDetached
 	upDaemonWaitFn        = daemon.WaitForDaemon
 	upDaemonSendIPCFn     = daemon.SendIPC
@@ -110,9 +109,6 @@ then start all services defined in it.
 		}
 
 		if !upDaemonIsRunningFn() {
-			if err := upEnsurePortsFn(); err != nil {
-				return err
-			}
 			if err := upDaemonRunDetachedFn(); err != nil {
 				return fmt.Errorf("starting daemon: %w", err)
 			}

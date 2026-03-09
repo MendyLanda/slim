@@ -26,7 +26,6 @@ func setupUpTestHooks(t *testing.T) func() {
 	prevRunning := upDaemonIsRunningFn
 	prevIsChild := upDaemonIsChildFn
 	prevNewPortFwd := upNewPortFwdFn
-	prevPorts := upEnsurePortsFn
 	prevDetached := upDaemonRunDetachedFn
 	prevWait := upDaemonWaitFn
 	prevIPC := upDaemonSendIPCFn
@@ -44,7 +43,6 @@ func setupUpTestHooks(t *testing.T) func() {
 		upDaemonIsRunningFn = prevRunning
 		upDaemonIsChildFn = prevIsChild
 		upNewPortFwdFn = prevNewPortFwd
-		upEnsurePortsFn = prevPorts
 		upDaemonRunDetachedFn = prevDetached
 		upDaemonWaitFn = prevWait
 		upDaemonSendIPCFn = prevIPC
@@ -70,7 +68,6 @@ func TestUpStartsDaemonForProjectServices(t *testing.T) {
 	upEnsureLeafCertFn = func(string) error { return nil }
 	upDaemonIsRunningFn = func() bool { return false }
 	upDaemonIsChildFn = func() bool { return true }
-	upEnsurePortsFn = func() error { return nil }
 	upDaemonRunDetachedFn = func() error { return nil }
 	upDaemonWaitFn = func() error { return nil }
 

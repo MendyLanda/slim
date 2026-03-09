@@ -117,6 +117,7 @@ func run() error {
 			defer cancel()
 			_ = srv.Shutdown(ctx)
 			_ = os.Remove(config.PidPath())
+			proxy.RemoveProxyPorts()
 		})
 	}
 	defer cleanup()

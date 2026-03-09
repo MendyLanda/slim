@@ -7,9 +7,6 @@ import (
 )
 
 const (
-	ProxyHTTPPort  = 10080
-	ProxyHTTPSPort = 10443
-
 	defaultAPIBase      = "https://app.slim.sh"
 	defaultTunnelServer = "wss://app.slim.sh/tunnel"
 )
@@ -69,4 +66,8 @@ func AuthPath() string {
 
 func PFTokenPath() string {
 	return filepath.Join(Dir(), "pf.token")
+}
+
+func ProxyPortsPath() string {
+	return filepath.Join(Dir(), "proxy-ports")
 }

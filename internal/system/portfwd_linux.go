@@ -8,8 +8,8 @@ import (
 	"os/exec"
 	"strings"
 
-	"github.com/kamranahmedse/slim/internal/config"
 	"github.com/kamranahmedse/slim/internal/osutil"
+	"github.com/kamranahmedse/slim/internal/proxy"
 )
 
 type linuxPortFwd struct{}
@@ -31,13 +31,18 @@ func (l *linuxPortFwd) Enable() error {
 		return errors.New("iptables not found (install iptables)")
 	}
 
+	httpPort, httpsPort, err := proxy.ReadProxyPorts()
+	if err != nil {
+		return fmt.Errorf("reading proxy ports: %w", err)
+	}
+
 	if err := l.ensureChain(); err != nil {
 		return err
 	}
-	if err := l.ensureRedirectRule(80, config.ProxyHTTPPort); err != nil {
+	if err := l.ensureRedirectRule(80, httpPort); err != nil {
 		return err
 	}
-	if err := l.ensureRedirectRule(443, config.ProxyHTTPSPort); err != nil {
+	if err := l.ensureRedirectRule(443, httpsPort); err != nil {
 		return err
 	}
 
